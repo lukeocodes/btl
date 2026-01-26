@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use nix::sys::signal;
 use nix::unistd::Pid;
+use std::thread;
+use std::time::Duration;
 
 #[cfg(unix)]
 pub fn get_current_uid() -> u32 {
@@ -53,4 +55,37 @@ pub fn validate_pid(pid: u32, expected_uid: u32) -> bool {
     {
         true
     }
+}
+
+pub fn kill_process_gracefully(pid: u32) -> Result<()> {
+    let pid = Pid::from_raw(pid as i32);
+
+    // Try SIGTERM first
+    if let Err(e) = signal::kill(pid, signal::Signal::SIGTERM) {
+        return Err(anyhow::anyhow!("Failed to send SIGTERM: {}", e));
+    }
+
+    // Wait up to 3 seconds for graceful shutdown
+    for _ in 0..30 {
+        thread::sleep(Duration::from_millis(100));
+        if signal::kill(pid, None).is_err() {
+            return Ok(());
+        }
+    }
+
+    // Still alive, force kill with SIGKILL
+    eprintln!("[btl] Process {} did not respond to SIGTERM, sending SIGKILL", pid);
+    signal::kill(pid, signal::Signal::SIGKILL)
+        .context("Failed to send SIGKILL")?;
+
+    // Wait up to 1 second for final cleanup
+    for _ in 0..10 {
+        thread::sleep(Duration::from_millis(100));
+        if signal::kill(pid, None).is_err() {
+            return Ok(());
+        }
+    }
+
+    eprintln!("[btl] Warning: Process {} may still be running", pid);
+    Ok(())
 }

@@ -4,7 +4,7 @@ mod process;
 mod cli;
 
 use anyhow::Result;
-use chrono::Utc;
+use chrono::{Utc, Local};
 
 fn main() -> Result<()> {
     // Refuse to run as root
@@ -25,7 +25,10 @@ fn main() -> Result<()> {
 }
 
 fn handle_subcommand(cmd: cli::Commands) -> Result<()> {
-    println!("Subcommand not yet implemented");
+    match cmd {
+        cli::Commands::List => handle_list()?,
+        _ => println!("Subcommand not yet implemented"),
+    }
     Ok(())
 }
 
@@ -82,6 +85,47 @@ fn handle_background_command(args: &[String]) -> Result<()> {
     println!("[btl] Process backgrounded (PID {})", pid);
     println!("[btl] Hash: {}", hash);
     println!("[btl] Logs: {}", log_file.display());
+
+    Ok(())
+}
+
+fn handle_list() -> Result<()> {
+    state::ensure_dirs()?;
+
+    let state_path = state::get_state_path()?;
+    let mut btl_state = state::load_state(&state_path)?;
+
+    // Clean stale entries
+    state::validate_and_clean_state(&mut btl_state)?;
+    state::save_state(&state_path, &btl_state)?;
+
+    if btl_state.processes.is_empty() {
+        println!("No background processes tracked");
+        return Ok(());
+    }
+
+    println!("{:<16} {:<8} {:<20} {:<30} {}",
+        "HASH", "PID", "STARTED", "COMMAND", "CWD");
+
+    for (hash, proc) in &btl_state.processes {
+        let duration = Local::now().signed_duration_since(proc.started_at);
+        let started = if duration.num_hours() > 0 {
+            format!("{}h ago", duration.num_hours())
+        } else if duration.num_minutes() > 0 {
+            format!("{}m ago", duration.num_minutes())
+        } else {
+            format!("{}s ago", duration.num_seconds())
+        };
+
+        let command_display = if proc.command.len() > 28 {
+            format!("{}...", &proc.command[..28])
+        } else {
+            proc.command.clone()
+        };
+
+        println!("{:<16} {:<8} {:<20} {:<30} {}",
+            hash, proc.pid, started, command_display, proc.cwd.display());
+    }
 
     Ok(())
 }

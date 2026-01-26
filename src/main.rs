@@ -27,6 +27,7 @@ fn main() -> Result<()> {
 fn handle_subcommand(cmd: cli::Commands) -> Result<()> {
     match cmd {
         cli::Commands::List => handle_list()?,
+        cli::Commands::Clean { all } => handle_clean(all)?,
         _ => println!("Subcommand not yet implemented"),
     }
     Ok(())
@@ -127,5 +128,32 @@ fn handle_list() -> Result<()> {
             hash, proc.pid, started, command_display, proc.cwd.display());
     }
 
+    Ok(())
+}
+
+fn handle_clean(all: bool) -> Result<()> {
+    state::ensure_dirs()?;
+
+    let state_path = state::get_state_path()?;
+    let mut btl_state = state::load_state(&state_path)?;
+
+    if all {
+        let count = btl_state.processes.len();
+        btl_state.processes.clear();
+        println!("[btl] Removed {} entries", count);
+    } else {
+        let before = btl_state.processes.len();
+        state::validate_and_clean_state(&mut btl_state)?;
+        let after = btl_state.processes.len();
+        let removed = before - after;
+
+        if removed > 0 {
+            println!("[btl] Removed {} dead process entries", removed);
+        } else {
+            println!("[btl] No dead processes found");
+        }
+    }
+
+    state::save_state(&state_path, &btl_state)?;
     Ok(())
 }

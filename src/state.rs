@@ -90,3 +90,31 @@ pub fn save_state(state_path: &Path, state: &BtlState) -> Result<()> {
 
     Ok(())
 }
+
+pub fn validate_and_clean_state(state: &mut BtlState) -> Result<()> {
+    let current_uid = crate::process::get_current_uid();
+    let mut to_remove = Vec::new();
+
+    for (hash, proc_state) in &state.processes {
+        // Remove if process is dead
+        if !crate::process::is_process_alive(proc_state.pid) {
+            to_remove.push(hash.clone());
+            continue;
+        }
+
+        // Remove if UID doesn't match (defensive)
+        if proc_state.user_id != current_uid {
+            eprintln!(
+                "[btl] Removing process {} - belongs to different user",
+                hash
+            );
+            to_remove.push(hash.clone());
+        }
+    }
+
+    for hash in to_remove {
+        state.processes.remove(&hash);
+    }
+
+    Ok(())
+}

@@ -21,7 +21,7 @@
     "btl": {
       "type": "binary",
       "install": {
-        "cargo": "btl"
+        "cargo": "rust-btl"
       },
       "check": "btl --version"
     }

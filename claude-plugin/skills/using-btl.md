@@ -38,6 +38,9 @@ Don't use btl for:
 ## Installation
 
 ```bash
+# Via cargo (recommended)
+cargo install rust-btl
+
 # From source in btl directory
 cargo install --path .
 

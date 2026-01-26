@@ -89,22 +89,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "btl"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "clap",
- "dirs",
- "hex",
- "libc",
- "nix",
- "serde",
- "serde_json",
- "sha2",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -420,6 +404,22 @@ dependencies = [
  "getrandom",
  "libredox",
  "thiserror",
+]
+
+[[package]]
+name = "rust-btl"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "dirs",
+ "hex",
+ "libc",
+ "nix",
+ "serde",
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]

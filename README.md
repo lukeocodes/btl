@@ -25,7 +25,7 @@ sudo cp target/release/btl /usr/local/bin/
 ### Using Cargo
 
 ```bash
-cargo install btl
+cargo install rust-btl
 ```
 
 ## Usage

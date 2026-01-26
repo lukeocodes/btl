@@ -19,7 +19,7 @@ btl (pronounced "bottle") is a CLI tool that backgrounds processes and automatic
 
 ### Via Cargo (Rust)
 ```bash
-cargo install btl
+cargo install rust-btl
 ```
 
 ### From Source

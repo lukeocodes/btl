@@ -65,7 +65,7 @@ cargo publish
 
 ```bash
 # In a fresh directory, try installing
-cargo install btl
+cargo install rust-btl
 
 # Test it works
 btl --version
@@ -210,7 +210,7 @@ Keep plugin version in sync with crate version for simplicity.
    Background processes that auto-replace on restart.
    Perfect for dev servers, watchers, builds.
 
-   cargo install btl
+   cargo install rust-btl
 
    Also available as @ClaudeCode plugin!
 

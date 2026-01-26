@@ -1,5 +1,5 @@
 [package]
-name = "btl"
+name = "rust-btl"
 version = "0.1.0"
 edition = "2021"
 authors = ["Luke Oliff <luke@lukeoliff.com>"]
@@ -9,6 +9,10 @@ repository = "https://github.com/lukeocodes/btl"
 keywords = ["background", "process", "task", "manager", "daemon"]
 categories = ["command-line-utilities", "development-tools"]
 readme = "README.md"
+
+[[bin]]
+name = "btl"
+path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

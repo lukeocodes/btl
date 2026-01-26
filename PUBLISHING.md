@@ -87,9 +87,9 @@ btl help
 
 ### Step 1: Prepare Plugin Package
 
-The plugin is already created in `claude-btl-plugin/`:
+The plugin is already created in `claude-plugin/`:
 ```
-claude-btl-plugin/
+claude-plugin/
 ├── plugin.json          # Plugin metadata
 ├── README.md           # Marketplace description
 └── skills/
@@ -102,13 +102,13 @@ You have two options:
 
 **Option A: Separate Plugin Repo (Recommended)**
 ```bash
-cd claude-btl-plugin
+cd claude-plugin
 git init
 git add .
 git commit -m "Initial btl plugin for Claude Code"
 
-# Create repo on GitHub: claude-btl-plugin
-git remote add origin https://github.com/lukeocodes/claude-btl-plugin.git
+# Create repo on GitHub: claude-plugin
+git remote add origin https://github.com/lukeocodes/claude-plugin.git
 git push -u origin main
 
 # Tag the release
@@ -119,7 +119,7 @@ git push origin v0.1.0
 **Option B: Subdirectory in btl Repo**
 ```bash
 # In btl repo root
-git add claude-btl-plugin
+git add claude-plugin
 git commit -m "Add Claude Code plugin"
 git push
 
@@ -133,7 +133,7 @@ git push origin plugin-v0.1.0
 1. Visit the Claude Code marketplace submission page
 2. Fill in the submission form:
    - **Plugin Name**: btl
-   - **Repository URL**: https://github.com/lukeocodes/claude-btl-plugin (or btl repo URL)
+   - **Repository URL**: https://github.com/lukeocodes/claude-plugin (or btl repo URL)
    - **Version**: 0.1.0
    - **Description**: Copy from plugin.json
    - **Installation Requirements**: Specify btl binary needed

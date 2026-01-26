@@ -28,6 +28,7 @@ fn handle_subcommand(cmd: cli::Commands) -> Result<()> {
     match cmd {
         cli::Commands::List => handle_list()?,
         cli::Commands::Clean { all } => handle_clean(all)?,
+        cli::Commands::Kill { hash, all } => handle_kill(hash, all)?,
         _ => println!("Subcommand not yet implemented"),
     }
     Ok(())
@@ -152,6 +153,40 @@ fn handle_clean(all: bool) -> Result<()> {
         } else {
             println!("[btl] No dead processes found");
         }
+    }
+
+    state::save_state(&state_path, &btl_state)?;
+    Ok(())
+}
+
+fn handle_kill(hash: Option<String>, all: bool) -> Result<()> {
+    state::ensure_dirs()?;
+
+    let state_path = state::get_state_path()?;
+    let mut btl_state = state::load_state(&state_path)?;
+
+    if all {
+        let count = btl_state.processes.len();
+        for (h, proc) in &btl_state.processes {
+            println!("[btl] Killing process {} (PID {})", h, proc.pid);
+            if let Err(e) = process::kill_process_gracefully(proc.pid) {
+                eprintln!("[btl] Warning: Failed to kill {}: {}", h, e);
+            }
+        }
+        btl_state.processes.clear();
+        println!("[btl] Killed {} processes", count);
+    } else if let Some(h) = hash {
+        if let Some(proc) = btl_state.processes.remove(&h) {
+            println!("[btl] Killing process {} (PID {})", h, proc.pid);
+            process::kill_process_gracefully(proc.pid)?;
+            println!("[btl] Process killed");
+        } else {
+            eprintln!("Error: Process {} not found", h);
+            std::process::exit(1);
+        }
+    } else {
+        eprintln!("Error: Provide a hash or --all flag");
+        std::process::exit(1);
     }
 
     state::save_state(&state_path, &btl_state)?;

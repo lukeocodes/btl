@@ -5,6 +5,9 @@ mod cli;
 
 use anyhow::Result;
 use chrono::{Utc, Local};
+use std::fs;
+use std::io::{BufRead, BufReader};
+use std::process::Command as StdCommand;
 
 fn main() -> Result<()> {
     // Refuse to run as root
@@ -29,7 +32,7 @@ fn handle_subcommand(cmd: cli::Commands) -> Result<()> {
         cli::Commands::List => handle_list()?,
         cli::Commands::Clean { all } => handle_clean(all)?,
         cli::Commands::Kill { hash, all } => handle_kill(hash, all)?,
-        _ => println!("Subcommand not yet implemented"),
+        cli::Commands::Logs { hash } => handle_logs(hash)?,
     }
     Ok(())
 }
@@ -190,5 +193,45 @@ fn handle_kill(hash: Option<String>, all: bool) -> Result<()> {
     }
 
     state::save_state(&state_path, &btl_state)?;
+    Ok(())
+}
+
+fn handle_logs(hash: Option<String>) -> Result<()> {
+    state::ensure_dirs()?;
+
+    let state_path = state::get_state_path()?;
+    let btl_state = state::load_state(&state_path)?;
+
+    if let Some(h) = hash {
+        if let Some(proc) = btl_state.processes.get(&h) {
+            println!("[btl] Tailing {}", proc.log_file.display());
+            println!("---");
+
+            // Use tail -f if available, otherwise read file
+            let tail_result = StdCommand::new("tail")
+                .arg("-f")
+                .arg(&proc.log_file)
+                .status();
+
+            if tail_result.is_err() {
+                // Fallback: just read the file
+                let file = fs::File::open(&proc.log_file)?;
+                let reader = BufReader::new(file);
+                for line in reader.lines() {
+                    println!("{}", line?);
+                }
+            }
+        } else {
+            eprintln!("Error: Process {} not found", h);
+            std::process::exit(1);
+        }
+    } else {
+        // Show all available logs
+        println!("Available logs:");
+        for (h, proc) in &btl_state.processes {
+            println!("  {} -> {}", h, proc.log_file.display());
+        }
+    }
+
     Ok(())
 }

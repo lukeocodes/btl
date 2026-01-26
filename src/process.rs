@@ -1,6 +1,10 @@
 use anyhow::{Context, Result};
 use nix::sys::signal;
 use nix::unistd::Pid;
+use std::fs::{File, OpenOptions};
+use std::os::unix::process::CommandExt;
+use std::path::Path;
+use std::process::{Command, Stdio};
 use std::thread;
 use std::time::Duration;
 
@@ -88,4 +92,43 @@ pub fn kill_process_gracefully(pid: u32) -> Result<()> {
 
     eprintln!("[btl] Warning: Process {} may still be running", pid);
     Ok(())
+}
+
+pub fn spawn_background_process(
+    command: &str,
+    args: &[String],
+    log_file: &Path,
+) -> Result<u32> {
+    let mut cmd = Command::new(command);
+    cmd.args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::from(
+            File::create(log_file)
+                .context("Failed to create log file")?
+        ))
+        .stderr(Stdio::from(
+            OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(log_file)
+                .context("Failed to open log file for stderr")?
+        ));
+
+    // Detach from parent process group
+    #[cfg(unix)]
+    unsafe {
+        cmd.pre_exec(|| {
+            nix::unistd::setsid()
+                .map(|_| ())
+                .map_err(|e| std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("setsid failed: {}", e)
+                ))
+        });
+    }
+
+    let child = cmd.spawn()
+        .context("Failed to spawn process")?;
+
+    Ok(child.id())
 }

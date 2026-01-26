@@ -20,6 +20,7 @@ pub fn is_process_alive(pid: u32) -> bool {
 }
 
 #[cfg(unix)]
+#[allow(dead_code)]
 pub fn get_process_uid(pid: u32) -> Result<u32> {
     use std::fs;
 
@@ -40,7 +41,7 @@ pub fn get_process_uid(pid: u32) -> Result<u32> {
     Err(anyhow::anyhow!("Could not find UID in process status"))
 }
 
-pub fn validate_pid(pid: u32, expected_uid: u32) -> bool {
+pub fn validate_pid(pid: u32, #[allow(unused_variables)] expected_uid: u32) -> bool {
     if !is_process_alive(pid) {
         return false;
     }
@@ -57,6 +58,7 @@ pub fn validate_pid(pid: u32, expected_uid: u32) -> bool {
     // On macOS, just trust the alive check (harder to get UID)
     #[cfg(not(target_os = "linux"))]
     {
+        let _ = expected_uid; // Suppress unused warning on non-Linux
         true
     }
 }

@@ -87,11 +87,13 @@ btl pnpm run dev
 btl pnpm run api     # In api/ directory
 btl pnpm run frontend # In frontend/ directory
 
-# Check what's running
+# Check what's running (always check status field)
 btl list
 
 # View logs if something goes wrong
-btl logs <hash>
+# IMPORTANT: Check status first!
+# - If status=running: btl logs <hash>
+# - If status=dead: cat ~/.btl/logs/<hash>.log
 ```
 
 ## Hash-Based Identification
@@ -157,16 +159,118 @@ btl list
 ```
 
 ### Debugging
-```bash
-# Process not responding?
-btl list  # Get hash
 
-# Check logs
+```dot
+digraph btl_debug {
+    "Process not working?" [shape=doublecircle];
+    "Run btl list" [shape=box];
+    "Check Status field" [shape=diamond];
+    "Status = running?" [shape=diamond];
+    "Status = dead?" [shape=diamond];
+    "Read log file directly" [shape=box];
+    "Tail logs with btl logs" [shape=box];
+    "Kill and restart" [shape=box];
+    "Check directory/command" [shape=box];
+    "Done" [shape=doublecircle];
+
+    "Process not working?" -> "Run btl list";
+    "Run btl list" -> "Check Status field";
+    "Check Status field" -> "Status = running?" [label="status=running"];
+    "Check Status field" -> "Status = dead?" [label="status=dead"];
+
+    "Status = running?" -> "Tail logs with btl logs" [label="yes"];
+    "Status = running?" -> "Kill and restart" [label="no"];
+
+    "Status = dead?" -> "Read log file directly" [label="yes"];
+    "Status = dead?" -> "Run btl list" [label="unknown"];
+
+    "Read log file directly" -> "Check directory/command";
+    "Tail logs with btl logs" -> "Kill and restart";
+    "Check directory/command" -> "Kill and restart";
+    "Kill and restart" -> "Done";
+}
+```
+
+**Critical:** Always check status before running `btl logs <hash>`. If status is "dead", the process failed during startup and `btl logs` may hang. Read the log file directly instead.
+
+#### Quick Diagnosis (30 seconds)
+
+When a process isn't working, follow this fast pattern:
+
+```bash
+# 1. Check status
+btl list
+
+# 2. Based on status:
+# - If status=dead: cat ~/.btl/logs/<hash>.log
+# - If status=running: btl logs <hash>
+# - If no log file: btl clean, check pwd, restart
+
+# 3. Common fixes:
+pwd                    # Wrong directory?
+ls package.json        # Missing project files?
+btl kill <hash>        # Clean up
+btl <command>          # Restart
+```
+
+#### Status-Based Debugging
+
+| Status | Meaning | Action |
+|--------|---------|--------|
+| `running` | Process is active | Use `btl logs <hash>` to tail logs |
+| `dead` | Process exited/failed | Read `~/.btl/logs/<hash>.log` directly |
+| Not in list | Never tracked or cleaned | Check `btl clean` output |
+
+#### Debugging Workflow
+
+**When process is running but misbehaving:**
+```bash
+# Check status first
+btl list
+
+# If status=running, tail live logs
 btl logs <hash>
 
-# Kill and restart
+# Or follow logs in real-time
+tail -f ~/.btl/logs/<hash>.log
+```
+
+**When process died immediately (status=dead):**
+```bash
+# DO NOT use btl logs - it may hang
+# Read log file directly instead
+cat ~/.btl/logs/<hash>.log
+
+# Common causes:
+# - Wrong directory (no package.json, missing files)
+# - Missing dependencies (pnpm/npm not installed)
+# - Port already in use
+# - Syntax errors in code
+
+# After fixing, clean and restart
 btl kill <hash>
+# Navigate to correct directory if needed
+cd /path/to/project
 btl <original-command>
+```
+
+**Quick debug pattern:**
+```bash
+# 1. Check status
+btl list
+
+# 2. If dead, read logs directly (don't use btl logs)
+cat ~/.btl/logs/<hash>.log
+
+# 3. Common issues to check:
+pwd                    # Are you in the right directory?
+ls package.json        # Does project file exist here?
+which pnpm            # Is tool installed?
+lsof -i :<port>       # Is port already taken?
+
+# 4. Fix issue, then restart
+btl kill <hash>
+btl <command>
 ```
 
 ## Common Mistakes
@@ -196,6 +300,25 @@ btl pnpm dev
 # Process still runs (by design)
 ```
 **Fix:** This is intentional (uses setsid). Use `btl kill --all` to clean up
+
+**Mistake:** Running `btl logs` on a dead process
+```bash
+btl list  # Shows status=dead
+btl logs <hash>  # ❌ Hangs forever - no logs to tail
+```
+**Fix:** Check status first. If dead, read log file directly: `cat ~/.btl/logs/<hash>.log`
+
+**Mistake:** Log file doesn't exist for dead process
+```bash
+cat ~/.btl/logs/<hash>.log  # No such file or directory
+```
+**Fix:** Process failed before writing logs (wrong directory, spawn failure). Clean dead entry and restart:
+```bash
+btl clean              # Remove dead entries
+pwd                    # Check you're in project directory
+cd /path/to/project    # Navigate if needed
+btl <original-command> # Restart
+```
 
 ## Safety Features
 

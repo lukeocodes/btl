@@ -21,8 +21,7 @@
     "btl": {
       "type": "binary",
       "install": {
-        "cargo": "btl",
-        "homebrew": "lukeocodes/btl/btl"
+        "cargo": "btl"
       },
       "check": "btl --version"
     }

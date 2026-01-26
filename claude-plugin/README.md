@@ -22,11 +22,6 @@ btl (pronounced "bottle") is a CLI tool that backgrounds processes and automatic
 cargo install btl
 ```
 
-### Via Homebrew (Coming Soon)
-```bash
-brew install lukeocodes/btl/btl
-```
-
 ### From Source
 ```bash
 git clone https://github.com/lukeocodes/btl

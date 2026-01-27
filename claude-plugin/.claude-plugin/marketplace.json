@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "btl-local",
-  "description": "Local development marketplace for btl plugin",
+  "name": "btl",
+  "description": "btl - Background task manager for long-running processes",
   "owner": {
     "name": "Luke Oliff",
     "email": "luke@lukeoliff.com"

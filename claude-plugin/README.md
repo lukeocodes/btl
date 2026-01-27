@@ -17,12 +17,35 @@ btl (pronounced "bottle") is a CLI tool that backgrounds processes and automatic
 
 ## Installation
 
-### Via Cargo (Rust)
+### Claude Code Plugin
+
+**[📦 Plugin Installation Guide](INSTALL.md)** - Complete instructions for installing the btl plugin in Claude Code.
+
+Quick install:
+```bash
+# Clone the repository
+git clone https://github.com/lukeocodes/btl
+cd btl
+
+# Add the btl marketplace
+claude plugin marketplace add ./claude-plugin
+
+# Install the plugin
+claude plugin install btl@btl
+```
+
+See [INSTALL.md](INSTALL.md) for detailed instructions and troubleshooting.
+
+### btl CLI Tool
+
+Install the btl command-line tool:
+
+#### Via Cargo (Rust)
 ```bash
 cargo install rust-btl
 ```
 
-### From Source
+#### From Source
 ```bash
 git clone https://github.com/lukeocodes/btl
 cd btl

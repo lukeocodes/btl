@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "btl-local",
+  "description": "Local development marketplace for btl plugin",
+  "owner": {
+    "name": "Luke Oliff",
+    "email": "luke@lukeoliff.com"
+  },
+  "plugins": [
+    {
+      "name": "btl",
+      "description": "Bottle up your processes - background and auto-replace long-running commands like dev servers, watchers, and builds",
+      "version": "0.1.2",
+      "author": {
+        "name": "Luke Oliff",
+        "email": "luke@lukeoliff.com"
+      },
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/lukeocodes/btl"
+    }
+  ]
+}

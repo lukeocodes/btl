@@ -1,6 +1,6 @@
 [package]
 name = "rust-btl"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Luke Oliff <luke@lukeoliff.com>"]
 license = "MIT"

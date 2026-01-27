@@ -19,7 +19,7 @@ cargo install --path .
 Verify installation:
 ```bash
 btl --version
-# Should show: btl 0.1.2 (or later)
+# Should show: btl 0.1.3 (or later)
 ```
 
 ## Installation Methods
@@ -49,7 +49,7 @@ btl --version
    ```bash
    claude plugin list | grep btl
    # Should show: ❯ btl@btl
-   #              Version: 0.1.2
+   #              Version: 0.1.3
    #              Status: ✔ enabled
    ```
 

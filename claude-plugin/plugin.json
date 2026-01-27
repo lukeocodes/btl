@@ -1,6 +1,6 @@
 {
   "name": "btl",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "displayName": "btl - Background Task Manager",
   "description": "Bottle up your processes - background and auto-replace long-running commands like dev servers, watchers, and builds",
   "author": "Luke Oliff <luke@lukeoliff.com>",

@@ -24,7 +24,29 @@ btl --version
 
 ## Installation Methods
 
-### Install from Local Clone
+### Install from Marketplace (Recommended)
+
+1. **Add the marketplace:**
+   ```bash
+   /plugin marketplace add lukeocodes/claude-plugins
+   ```
+
+2. **Install the plugin:**
+   ```bash
+   /plugin install btl@lukeocodes-claude-plugins
+   ```
+
+3. **Verify installation:**
+   ```bash
+   /plugin list
+   # Should show: ❯ btl@lukeocodes-claude-plugins
+   #              Version: 0.1.3
+   #              Status: ✔ enabled
+   ```
+
+### Install from Local Clone (Development)
+
+For plugin development or testing local changes:
 
 1. **Clone the repository:**
    ```bash
@@ -32,22 +54,22 @@ btl --version
    cd btl
    ```
 
-2. **Add the marketplace:**
+2. **Add as local marketplace:**
    ```bash
-   # Use absolute path to the claude-plugin directory
-   claude plugin marketplace add ~/path/to/btl/claude-plugin
+   # Use absolute path to the repository root
+   /plugin marketplace add ~/path/to/btl
    ```
 
-   This will create a marketplace named `btl`.
+   This creates a local marketplace named `btl`.
 
 3. **Install the plugin:**
    ```bash
-   claude plugin install btl@btl
+   /plugin install btl@btl
    ```
 
 4. **Verify installation:**
    ```bash
-   claude plugin list | grep btl
+   /plugin list
    # Should show: ❯ btl@btl
    #              Version: 0.1.3
    #              Status: ✔ enabled
@@ -82,10 +104,10 @@ Example prompts that trigger the skill:
 ### From GitHub Marketplace
 ```bash
 # Update the marketplace
-claude plugin marketplace update btl
+/plugin marketplace update lukeocodes-claude-plugins
 
 # Update the plugin
-claude plugin update btl@btl
+/plugin update btl@lukeocodes-claude-plugins
 ```
 
 ### From Local Development Marketplace
@@ -95,36 +117,40 @@ cd ~/path/to/btl
 git pull origin main
 
 # Update the marketplace
-claude plugin marketplace update btl
+/plugin marketplace update btl
 
 # Update the plugin
-claude plugin update btl@btl
+/plugin update btl@btl
 ```
 
 ## Uninstalling
 
 ```bash
 # Remove the plugin
-claude plugin uninstall btl@btl
+/plugin uninstall btl@lukeocodes-claude-plugins
+
+# Or if installed from local clone
+/plugin uninstall btl@btl
 
 # Remove the marketplace (optional)
-claude plugin marketplace remove btl
+/plugin marketplace remove lukeocodes-claude-plugins
 ```
 
 ## Troubleshooting
 
 ### Plugin Not Found
-If `claude plugin install btl@btl` fails:
+If plugin installation fails:
 
 1. Verify marketplace is added:
    ```bash
-   claude plugin marketplace list
+   /plugin marketplace list
    ```
 
-2. Check marketplace path is correct:
+2. For local installations, check the repository has plugin files at root:
    ```bash
-   # Should point to the claude-plugin directory
-   ls ~/path/to/btl/claude-plugin/.claude-plugin/marketplace.json
+   # Should show plugin.json at repository root
+   ls ~/path/to/btl/plugin.json
+   ls ~/path/to/btl/skills/
    ```
 
 ### Skill Not Loading

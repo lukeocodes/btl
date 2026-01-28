@@ -13,7 +13,26 @@
 
 ## Installation
 
-### From Source
+### Claude Code Plugin
+
+This repository includes a Claude Code plugin that helps Claude suggest btl for process management tasks.
+
+**[📦 Plugin Installation Guide](docs/PLUGIN_INSTALL.md)** - Complete instructions for installing the btl plugin in Claude Code.
+
+Quick install from the marketplace:
+```bash
+# Add the marketplace
+/plugin marketplace add lukeocodes/claude-plugins
+
+# Install the plugin
+/plugin install btl@lukeocodes-claude-plugins
+```
+
+See [docs/PLUGIN.md](docs/PLUGIN.md) for plugin documentation.
+
+### btl CLI Tool
+
+#### From Source
 
 ```bash
 git clone https://github.com/lukeocodes/btl.git
@@ -22,7 +41,7 @@ cargo build --release
 sudo cp target/release/btl /usr/local/bin/
 ```
 
-### Using Cargo
+#### Using Cargo
 
 ```bash
 cargo install rust-btl

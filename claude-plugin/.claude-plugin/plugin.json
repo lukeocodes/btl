@@ -1,9 +1,0 @@
-{
-  "name": "btl",
-  "description": "Bottle up your processes - background and auto-replace long-running commands like dev servers, watchers, and builds",
-  "version": "0.1.3",
-  "author": {
-    "name": "Luke Oliff",
-    "email": "luke@lukeoliff.com"
-  }
-}
